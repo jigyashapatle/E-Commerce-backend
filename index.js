@@ -1,4 +1,4 @@
-const port = 4000;
+const port = process.env.PORT || 4000;
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -8,7 +8,14 @@ const path = require("path")
 const cors = require("cors");
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://e-commerce-frontend-liard-kappa.vercel.app",
+    "https://e-commerce-admin-tau-eosin.vercel.app"
+  ],
+  credentials: true
+}));
+
 
 // Database Connection with mongodb
 mongoose.connect("mongodb+srv://greatstackdev:great123@cluster0.aeznngc.mongodb.net/e-commerce")
@@ -32,9 +39,10 @@ const upload = multer({storage:storage})
 app.use('/images',express.static('upload/images'))
 
 app.post("/upload",upload.single('product'),(req,res)=>{
+    const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${port}`;
     res.json({
         success:1,
-        image_url:`http://localhost:${port}/images/${req.file.filename}`
+        image_url:`${BACKEND_URL}/images/${req.file.filename}`
     })
 })
 
